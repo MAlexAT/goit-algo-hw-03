@@ -1,0 +1,31 @@
+import turtle
+
+# Функція для створення сніжинки Коха
+def koch_snowflake(side_length, level):
+    if level == 0:
+        turtle.forward(side_length)
+    else:
+        side_length /= 3
+        koch_snowflake(side_length, level - 1)
+        turtle.left(60)
+        koch_snowflake(side_length, level - 1)
+        turtle.right(120)
+        koch_snowflake(side_length, level - 1)
+        turtle.left(60)
+        koch_snowflake(side_length, level - 1)
+
+# Основна функція
+def draw_snowflake(side_length, level):
+    for _ in range(3):
+        koch_snowflake(side_length, level)
+        turtle.right(120)
+
+# Введення рівня рекурсії від користувача
+level = int(input("Введіть рівень рекурсії (рекомендовано від 0 до 5): "))
+turtle.speed(0)
+turtle.penup()
+turtle.goto(-200, 100)
+turtle.pendown()
+draw_snowflake(300, level)
+turtle.hideturtle()
+turtle.done()
