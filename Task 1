@@ -1,32 +1,41 @@
 import os
 import shutil
+import argparse
+import sys
 
-# Функція для рекурсивного копіювання та сортування файлів за розширенням
-def copy_and_sort_files(src_dir, dest_dir):
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
+# Функція для копіювання та сортування файлів за розширенням
+def copy_files(src_dir, dest_dir):
+    try:
+        for root, dirs, files in os.walk(src_dir):
+            for file in files:
+                ext = file.split('.')[-1]
+                dest_subdir = os.path.join(dest_dir, ext)
+                os.makedirs(dest_subdir, exist_ok=True)
+                shutil.copy(os.path.join(root, file), dest_subdir)
+    except Exception as e:
+        print(f"Помилка під час обробки: {e}")
 
-    for item in os.listdir(src_dir):
-        src_path = os.path.join(src_dir, item)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Копіювання та сортування файлів за розширенням.')
+    parser.add_argument('src', help='Вихідна директорія')
+    parser.add_argument('dest', nargs='?', default='dist', help='Директорія призначення (за замовчуванням dist)')
 
-        if os.path.isdir(src_path):
-            # Рекурсивно проходимо по всіх підпапках
-            copy_and_sort_files(src_path, dest_dir)
-        else:
-            # Отримуємо розширення файлу
-            file_ext = os.path.splitext(item)[1][1:]  # наприклад, "txt", "png"
-            ext_dir = os.path.join(dest_dir, file_ext)
+    # Додаємо блок обробки SystemExit для зручності тестування
+    try:
+        args = parser.parse_args()
+    except SystemExit as e:
+        print(f"Помилка: {e}")
+        sys.exit(2)
 
-            if not os.path.exists(ext_dir):
-                os.makedirs(ext_dir)
+    # Перевірка наявності директорії призначення
+    if not os.path.exists(args.dest):
+        os.makedirs(args.dest)
 
-            shutil.copy2(src_path, ext_dir)  # копіюємо файл до відповідної піддиректорії
+    # Виклик функції для копіювання та сортування
+    copy_files(args.src, args.dest)
 
 # Задаємо вихідну та цільову директорії
 src_dir = '/Users/newalex/Desktop/Projects/goit-algo-hw-03/files/source_folder'  # вихідна папка
 dest_dir = '/Users/newalex/Desktop/Projects/goit-algo-hw-03/files/destination_folder'  # папка призначення
-
-# Запускаємо функцію
-copy_and_sort_files(src_dir, dest_dir)
 
 print("Файли успішно скопійовано та відсортовано за розширенням!")
